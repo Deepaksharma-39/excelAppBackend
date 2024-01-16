@@ -1,12 +1,13 @@
 import express from "express";
 import { compareDataWithDB, findByCity, findByName, findByPan, findByPhone, findByemail, getPaginatedResult, getResult, test, testUpdate, upload } from "../controllers/text.js";
+import authenticate from "../middlewares/auth.js";
 
 const testRouter = express.Router();
 
 
-testRouter.get('/read', getResult);
+testRouter.get('/read',authenticate, getResult);
 
-testRouter.post('/upload', upload);
+testRouter.post('/upload',authenticate, upload);
 
 testRouter.post('/test', test);
 
