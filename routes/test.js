@@ -5,9 +5,9 @@ import authenticate from "../middlewares/auth.js";
 const testRouter = express.Router();
 
 
-testRouter.get('/read',authenticate, getResult);
+testRouter.get('/read', getResult);
 
-testRouter.post('/upload',authenticate, upload);
+testRouter.post('/upload', upload);
 
 testRouter.post('/test', test);
 
