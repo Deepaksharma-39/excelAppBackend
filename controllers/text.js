@@ -17,23 +17,46 @@ export const getResult = async (req, res) => {
 };
 
 export const upload = async (req, res) => {
+  const session = await Test.startSession();
+  session.startTransaction();
 
   try {
+    const newData = req.body;
+    
+    // Separate data into updates and inserts
+    const updates = newData.filter(item => item['_id']); // Assuming '_id' is present for updates
+    const inserts = newData.filter(item => !item['_id']);
 
-    await Test.deleteMany();
+    // Perform updates
+    if (updates.length > 0) {
+      for (const update of updates) {
+        await Test.updateOne({ _id: update._id }, update, { session });
+      }
+    }
 
-    const newData = req.body; // Replace with your actual way of getting new data
-    await Test.insertMany(newData)
+    // Perform inserts
+    if (inserts.length > 0) {
+      await Test.insertMany(inserts, { session });
+    }
+
+    // Commit the transaction
+    await session.commitTransaction();
+    session.endSession();
 
     // Send the result as JSON
-    
-    res.status(200).json({ success: true, message: "overwrite successful"});
-    
+    res.status(200).json({ success: true, message: "Upload successful" });
+
   } catch (err) {
-    console.error("test error : ", err);
+    console.error("Error during upload: ", err);
+
+    // Rollback the transaction in case of an error
+    await session.abortTransaction();
+    session.endSession();
+
     res.status(500).json({ success: false, message: "Internal Server error" });
   }
 };
+
 
 
 
